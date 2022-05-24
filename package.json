@@ -24,6 +24,6 @@
     "@toruslabs/starkware-crypto": "^1.0.0",
     "axios": "^0.24.0",
     "hardhat": "2.9.3",
-    "starknet": "^3.9.0"
+    "starknet": "3.10.0"
   }
 }

@@ -18,20 +18,20 @@ describe("Starknet", function () {
   it("should work for a fresh deployment", async function () {
     console.log("Started deployment");
 
-    const contract = new Contract(<any>l2_abi_erc20, ETH_ADDRESSES.goerli);
+    // const contract = new Contract(<any>l2_abi_erc20, ETH_ADDRESSES.goerli);
 
-    const balanceOf = await contract.balanceOf(
-      "0x2915b56d17db6ef371df3acbe645587c543f031104a39f3af8dd515cbcfb45d"
-    );
-    console.warn("contract: ", balanceOf.balance.low + "");
+    // const balanceOf = await contract.balanceOf(
+    //   "0x2915b56d17db6ef371df3acbe645587c543f031104a39f3af8dd515cbcfb45d"
+    // );
+    // console.warn("contract: ", balanceOf.balance.low + "");
 
-    const signer = new Signer(ec.getKeyPair('0x5fff72ce2c8657594746d0ab88c534521e0b27ddb2da34a417c3dc18fcac732'))
-    console.warn('signer: ', await signer.getPubKey());
+    // const signer = new Signer(ec.getKeyPair('0x5fff72ce2c8657594746d0ab88c534521e0b27ddb2da34a417c3dc18fcac732'))
+    // console.warn('signer: ', await signer.getPubKey());
     
 
-    // const contractFactory: StarknetContractFactory = await starknet.getContractFactory("ob_source");
-    // const contract: StarknetContract = await contractFactory.deploy({ initial_balance: 0 });
-    // console.log("Deployed at", contract.);
+    const contractFactory: StarknetContractFactory = await starknet.getContractFactory("ob_source");
+    const contract: StarknetContract = await contractFactory.deploy();
+    console.log("Deployed at", contract.address);
 
     // const { res: balanceBefore } = await contract.call("get_balance");
     // expect(balanceBefore).to.deep.equal(0n);

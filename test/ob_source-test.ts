@@ -1,14 +1,12 @@
-import {
-  Account,
-  Contract,
-  ec,
-  Provider, uint256
-} from "starknet";
+import { Account, Contract, ec, Provider, Signer, uint256 } from "starknet";
 import { getSelectorFromName } from "starknet/dist/utils/hash";
-import { BigNumberish } from "starknet/utils/number";
+import { compileCalldata } from "starknet/dist/utils/stark";
+import { BigNumberish, hexToDecimalString } from "starknet/utils/number";
 import ob_source_abi from "../starknet-artifacts/contracts/ob_source.cairo/ob_source_abi.json";
 import { TIMEOUT } from "./constants";
 import l2_abi_erc20 from "./l2_abi_erc20.json";
+import argent_accounts from "./argent_accounts.json";
+import { starknet } from "hardhat";
 
 const OK_TX_STATUSES = ["PENDING", "ACCEPTED_ON_L2", "ACCEPTED_ON_L1"];
 const ETH_ADDRESSES = {
@@ -21,18 +19,17 @@ const OB_SOURCE_ADDRESSES = {
 };
 
 function getUint256CalldataFromBN(bn: BigNumberish) {
-  return { type: "struct", ...uint256.bnToUint256(String(bn)) };
+  return { type: "struct" as const, ...uint256.bnToUint256(String(bn)) };
 }
 
 describe("Starknet", function () {
   this.timeout(TIMEOUT);
   it("Test ob_source", async function () {
+    const provider = new Provider({ network: "goerli-alpha" });
     const userSender = new Account(
-      new Provider({ network: "goerli-alpha" }),
-      "0x5752bd526744a191056b5dc5a04f5d726b223097f5d5364adca48f0c557e18c",
-      ec.getKeyPair(
-        "0x5fff72ce2c8657594746d0ab88c534521e0b27ddb2da34a417c3dc18fcac732"
-      )
+      provider,
+      argent_accounts["alpha-goerli"].address,
+      ec.getKeyPair(argent_accounts["alpha-goerli"].private_key)
     );
     const userRecipientAddress =
       "0x04a6a84c3235fedbb0c782de55a5146e04cceeb6261b19791e325767fdf8ddbd";
@@ -43,18 +40,18 @@ describe("Starknet", function () {
     );
     const obSourceContract = new Contract(
       <any>ob_source_abi,
-      ETH_ADDRESSES.goerli,
+      OB_SOURCE_ADDRESSES.goerli,
       userSender
     );
 
     const balanceSender = await ethContract.balanceOf(userSender.address);
     console.warn("balanceSender.balance: ", balanceSender.balance.low + "");
 
-    const balanceRecipient = await ethContract.balanceOf(userRecipientAddress);
-    console.warn(
-      "balanceRecipient.balance: ",
-      balanceRecipient.balance.low + ""
-    );
+    // const balanceRecipient = await ethContract.balanceOf(userRecipientAddress);
+    // console.warn(
+    //   "balanceRecipient.balance: ",
+    //   balanceRecipient.balance.low + ""
+    // );
 
     // Approve
     // const approveResp = await ethContract.call("approve", [
@@ -63,24 +60,61 @@ describe("Starknet", function () {
     // ]);
     // console.warn("approveResp: ", approveResp);
 
-    console.warn(getSelectorFromName('approve'));
-    
+    // console.warn(
+    //   compileCalldata({
+    //     recipient:
+    //       "0x066ad0b56a9e2b29513b88849bfd942f085d242aeb9faad3a5f2a05d9228aabc",
+    //     amount: getUint256CalldataFromBN(String(10 ** 12)),
+    //   })
+    // );
+
+    // const approveResp = await userSender.callContract({
+    //   contractAddress: ETH_ADDRESSES.goerli,
+    //   entrypoint: "transfer",
+    //   calldata: compileCalldata({
+    //     recipient:
+    //       "0x066ad0b56a9e2b29513b88849bfd942f085d242aeb9faad3a5f2a05d9228aabc",
+    //     amount: getUint256CalldataFromBN(String(10 ** 12)),
+    //   }),
+    // });
+
+    // const approveResp = await userSender.callContract({
+    //   contractAddress: ETH_ADDRESSES.goerli,
+    //   entrypoint: "balanceOf",
+    //   calldata: compileCalldata({
+    //     account:
+    //       "0x066ad0b56a9e2b29513b88849bfd942f085d242aeb9faad3a5f2a05d9228aabc",
+    //   }),
+    // });
+
+    // const approveResp = await userSender.execute({
+    //   contractAddress: ETH_ADDRESSES.goerli,
+    //   entrypoint: "approve",
+    //   calldata: compileCalldata({
+    //     spender: OB_SOURCE_ADDRESSES.goerli,
+    //     amount: getUint256CalldataFromBN(String(10 ** 20)),
+    //   }),
+    // });
+
     const approveResp = await ethContract.approve(
       OB_SOURCE_ADDRESSES.goerli,
-      getUint256CalldataFromBN(10 ** 20)
+      getUint256CalldataFromBN(String(10 ** 20))
     );
 
     console.warn("approveResp: ", approveResp);
 
     // const amount = 10 ** 14;
     // const ext = "0x1234567890000000";
-    // getUint256CalldataFromBN;
-    // const resp = await obSourceContract.transferERC20(
-    //   ETH_ADDRESSES.goerli,
-    //   userRecipientAddress,
-    //   getUint256CalldataFromBN(amount),
-    //   ext
-    // );
+    // const resp = await userSender.callContract({
+    //   contractAddress: OB_SOURCE_ADDRESSES.goerli,
+    //   entrypoint: "transferERC20",
+    //   calldata: compileCalldata({
+    //     _token: ETH_ADDRESSES.goerli,
+    //     _to: "0x066ad0b56a9e2b29513b88849bfd942f085d242aeb9faad3a5f2a05d9228aabc",
+    //     _amount: getUint256CalldataFromBN(amount),
+    //     _ext: ext,
+    //   }),
+    // });
     // console.warn("resp: ", resp);
 
     // const signer =

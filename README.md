@@ -23,6 +23,12 @@ npm ci
 npx hardhat starknet-compile contracts/contract.cairo
 ```
 
+#### Deploy a contract
+
+```
+npx hardhat starknet-deploy starknet-artifacts/contracts/contract.cairo
+```
+
 #### Run a test that interacts with the compiled contract
 
 ```

@@ -1,10 +1,7 @@
-import { Account, Contract, ec, Provider, Signer, uint256 } from "starknet";
-import { getSelectorFromName } from "starknet/dist/utils/hash";
-import { compileCalldata } from "starknet/dist/utils/stark";
-import { BigNumberish, hexToDecimalString } from "starknet/utils/number";
-import ob_source_abi from "../starknet-artifacts/contracts/ob_source.cairo/ob_source_abi.json";
-import { TIMEOUT } from "./constants";
+import { Contract, ec, Provider, uint256 } from "starknet";
+import { BigNumberish } from "starknet/utils/number";
 import compiledArgentAccount from "../account-contract-artifacts/0.2.0/ArgentAccount/ArgentAccount.cairo/ArgentAccount.json";
+import { TIMEOUT } from "./constants";
 
 const OK_TX_STATUSES = ["PENDING", "ACCEPTED_ON_L2", "ACCEPTED_ON_L1"];
 const ETH_ADDRESSES = {
